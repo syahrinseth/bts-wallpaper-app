@@ -1,113 +1,232 @@
+/// Flutter code sample for CupertinoPageScaffold
+
+// This example shows a [CupertinoPageScaffold] with a [ListView] as a [child].
+// The [CupertinoButton] is connected to a callback that increments a counter.
+// The [backgroundColor] can be changed.
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sliding_up_panel/flutter_sliding_up_panel.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(const MyApp());
 
+/// This is the main application widget.
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  const MyApp({Key? key}) : super(key: key);
+
+  static const String _title = 'Flutter Code Sample';
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+    return const CupertinoApp(
+      theme: CupertinoThemeData(brightness: Brightness.dark),
+      debugShowCheckedModeBanner: false,
+      title: _title,
+      home: MyStatefulWidget(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+/// This is the stateful widget that the main application instantiates.
+class MyStatefulWidget extends StatefulWidget {
+  const MyStatefulWidget({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+/// This is the private State class that goes with MyStatefulWidget.
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  int _count = 0;
+  ScrollController scrollController = ScrollController();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  ///The controller of sliding up panel
+  SlidingUpPanelController panelController = SlidingUpPanelController();
+
+  @override
+  void initState() {
+    panelController.hide();
+    scrollController.addListener(() {
+      if (scrollController.offset >=
+              scrollController.position.maxScrollExtent &&
+          !scrollController.position.outOfRange) {
+        panelController.expand();
+      } else if (scrollController.offset <=
+              scrollController.position.minScrollExtent &&
+          !scrollController.position.outOfRange) {
+        panelController.hide();
+      } else {}
     });
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+    return Stack(
+      children: [
+        CupertinoPageScaffold(
+          // Uncomment to change the background color
+          // backgroundColor: CupertinoColors.systemPink,
+          navigationBar: CupertinoNavigationBar(
+            leading: Icon(CupertinoIcons.bell_fill, size: 20.0),
+            middle: GestureDetector(
+                child: Text('BTS Wallpaper HD'),
+                onTap: () => panelController.expand()),
+            trailing: Icon(CupertinoIcons.square_split_2x2_fill, size: 20.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: GridView.count(
+              childAspectRatio: 0.65,
+              crossAxisCount: 2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              children: <Widget>[
+                // CupertinoButton(
+                //   onPressed: () => setState(() => _count++),
+                //   child: const Icon(CupertinoIcons.add),
+                // ),
+                // Center(
+                //   child: Text('You have pressed the button $_count times.'),
+                // ),
+                WallpaperCard(
+                    src:
+                        'https://static.asiachan.com/V.%28Kim.Taehyung%29.full.2690.jpg'),
+                WallpaperCard(
+                    src:
+                        'https://cdn1.i-scmp.com/sites/default/files/images/methode/2019/03/12/7348293c-3e24-11e9-b20a-0cdc8de4a6f4_image_hires_055900.jpg'),
+                WallpaperCard(
+                    src: 'https://static.asiachan.com/Suga.full.4446.jpg'),
+                WallpaperCard(
+                    src:
+                        'https://static.asiachan.com/V.%28Kim.Taehyung%29.full.2690.jpg'),
+                WallpaperCard(
+                    src:
+                        'https://cdn1.i-scmp.com/sites/default/files/images/methode/2019/03/12/7348293c-3e24-11e9-b20a-0cdc8de4a6f4_image_hires_055900.jpg'),
+                WallpaperCard(
+                    src: 'https://static.asiachan.com/Suga.full.4446.jpg'),
+              ],
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+          ),
+        ),
+        SlidingUpPanelWidget(
+          child: Container(
+            // margin: EdgeInsets.symmetric(horizontal: 15.0),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shadows: [
+                BoxShadow(
+                    blurRadius: 5.0,
+                    spreadRadius: 2.0,
+                    color: const Color(0x11000000))
+              ],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10.0),
+                  topRight: Radius.circular(10.0),
+                ),
+              ),
+            ),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  color: Colors.white,
+                  alignment: Alignment.center,
+                  height: 50.0,
+                  child: Row(
+                    children: <Widget>[
+                      // Icon(
+                      //   CupertinoIcons.clear,
+                      //   size: 30,
+                      // ),
+                      // Padding(
+                      //   padding: EdgeInsets.only(
+                      //     left: 8.0,
+                      //   ),
+                      // ),
+                      CupertinoButton(
+                        onPressed: () {
+                          panelController.hide();
+                        },
+                        child: Text(
+                          'Close',
+                        ),
+                      )
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                ),
+                Divider(
+                  height: 0.5,
+                  color: Colors.grey[300],
+                ),
+              ],
+              mainAxisSize: MainAxisSize.min,
+            ),
+          ),
+          controlHeight: 50.0,
+          anchor: 0.4,
+          panelController: panelController,
+          onTap: () {
+            ///Customize the processing logic
+            if (SlidingUpPanelStatus.expanded == panelController.status) {
+              panelController.hide();
+            } else {
+              panelController.expand();
+            }
+          }, //Pass a onTap callback to customize the processing logic when user click control bar.
+          enableOnTap: true, //Enable the onTap callback for control bar.
+          dragDown: (details) {
+            print('dragDown');
+          },
+          dragStart: (details) {
+            print('dragStart');
+          },
+          dragCancel: () {
+            print('dragCancel');
+          },
+          dragUpdate: (details) {
+            print(
+                'dragUpdate,${panelController.status == SlidingUpPanelStatus.dragging ? 'dragging' : ''}');
+          },
+          dragEnd: (details) {
+            print('dragEnd');
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class WallpaperCard extends StatelessWidget {
+  WallpaperCard({required this.src});
+  String src;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(10.0)),
+      ),
+      child: IntrinsicWidth(
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        Center(child: CupertinoActivityIndicator()),
+                    imageUrl: src,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
