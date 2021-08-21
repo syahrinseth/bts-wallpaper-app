@@ -4,12 +4,23 @@
 // The [CupertinoButton] is connected to a callback that increments a counter.
 // The [backgroundColor] can be changed.
 
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:bts_wallpaper_app/data/wallpaper.dart';
+import 'package:bts_wallpaper_app/dummy_wallpaper.dart';
+import 'package:bts_wallpaper_app/screens/wallpaper_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sliding_up_panel/flutter_sliding_up_panel.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:permission_handler/permission_handler.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  runApp(const MyApp());
+}
 
 /// This is the main application widget.
 class MyApp extends StatelessWidget {
@@ -38,26 +49,25 @@ class MyStatefulWidget extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  int _count = 0;
+  // int _count = 0;
   ScrollController scrollController = ScrollController();
 
   ///The controller of sliding up panel
-  SlidingUpPanelController panelController = SlidingUpPanelController();
+  // SlidingUpPanelController panelController = SlidingUpPanelController();
 
   @override
   void initState() {
-    panelController.hide();
-    scrollController.addListener(() {
-      if (scrollController.offset >=
-              scrollController.position.maxScrollExtent &&
-          !scrollController.position.outOfRange) {
-        panelController.expand();
-      } else if (scrollController.offset <=
-              scrollController.position.minScrollExtent &&
-          !scrollController.position.outOfRange) {
-        panelController.hide();
-      } else {}
-    });
+    // scrollController.addListener(() {
+    //   if (scrollController.offset >=
+    //           scrollController.position.maxScrollExtent &&
+    //       !scrollController.position.outOfRange) {
+    //     panelController.expand();
+    //   } else if (scrollController.offset <=
+    //           scrollController.position.minScrollExtent &&
+    //       !scrollController.position.outOfRange) {
+    //     panelController.anchor();
+    //   } else {}
+    // });
     super.initState();
   }
 
@@ -70,9 +80,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           // backgroundColor: CupertinoColors.systemPink,
           navigationBar: CupertinoNavigationBar(
             leading: Icon(CupertinoIcons.bell_fill, size: 20.0),
-            middle: GestureDetector(
-                child: Text('BTS Wallpaper HD'),
-                onTap: () => panelController.expand()),
+            middle:
+                GestureDetector(child: Text('BTS Wallpaper HD'), onTap: () {}),
             trailing: Icon(CupertinoIcons.square_split_2x2_fill, size: 20.0),
           ),
           child: Padding(
@@ -82,117 +91,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               crossAxisCount: 2,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
-              children: <Widget>[
-                // CupertinoButton(
-                //   onPressed: () => setState(() => _count++),
-                //   child: const Icon(CupertinoIcons.add),
-                // ),
-                // Center(
-                //   child: Text('You have pressed the button $_count times.'),
-                // ),
-                WallpaperCard(
-                    src:
-                        'https://static.asiachan.com/V.%28Kim.Taehyung%29.full.2690.jpg'),
-                WallpaperCard(
-                    src:
-                        'https://cdn1.i-scmp.com/sites/default/files/images/methode/2019/03/12/7348293c-3e24-11e9-b20a-0cdc8de4a6f4_image_hires_055900.jpg'),
-                WallpaperCard(
-                    src: 'https://static.asiachan.com/Suga.full.4446.jpg'),
-                WallpaperCard(
-                    src:
-                        'https://static.asiachan.com/V.%28Kim.Taehyung%29.full.2690.jpg'),
-                WallpaperCard(
-                    src:
-                        'https://cdn1.i-scmp.com/sites/default/files/images/methode/2019/03/12/7348293c-3e24-11e9-b20a-0cdc8de4a6f4_image_hires_055900.jpg'),
-                WallpaperCard(
-                    src: 'https://static.asiachan.com/Suga.full.4446.jpg'),
-              ],
+              children: DummyWallpaper.wallpapers,
             ),
           ),
-        ),
-        SlidingUpPanelWidget(
-          child: Container(
-            // margin: EdgeInsets.symmetric(horizontal: 15.0),
-            decoration: ShapeDecoration(
-              color: Colors.white,
-              shadows: [
-                BoxShadow(
-                    blurRadius: 5.0,
-                    spreadRadius: 2.0,
-                    color: const Color(0x11000000))
-              ],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10.0),
-                  topRight: Radius.circular(10.0),
-                ),
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  color: Colors.white,
-                  alignment: Alignment.center,
-                  height: 50.0,
-                  child: Row(
-                    children: <Widget>[
-                      // Icon(
-                      //   CupertinoIcons.clear,
-                      //   size: 30,
-                      // ),
-                      // Padding(
-                      //   padding: EdgeInsets.only(
-                      //     left: 8.0,
-                      //   ),
-                      // ),
-                      CupertinoButton(
-                        onPressed: () {
-                          panelController.hide();
-                        },
-                        child: Text(
-                          'Close',
-                        ),
-                      )
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  ),
-                ),
-                Divider(
-                  height: 0.5,
-                  color: Colors.grey[300],
-                ),
-              ],
-              mainAxisSize: MainAxisSize.min,
-            ),
-          ),
-          controlHeight: 50.0,
-          anchor: 0.4,
-          panelController: panelController,
-          onTap: () {
-            ///Customize the processing logic
-            if (SlidingUpPanelStatus.expanded == panelController.status) {
-              panelController.hide();
-            } else {
-              panelController.expand();
-            }
-          }, //Pass a onTap callback to customize the processing logic when user click control bar.
-          enableOnTap: true, //Enable the onTap callback for control bar.
-          dragDown: (details) {
-            print('dragDown');
-          },
-          dragStart: (details) {
-            print('dragStart');
-          },
-          dragCancel: () {
-            print('dragCancel');
-          },
-          dragUpdate: (details) {
-            print(
-                'dragUpdate,${panelController.status == SlidingUpPanelStatus.dragging ? 'dragging' : ''}');
-          },
-          dragEnd: (details) {
-            print('dragEnd');
-          },
         ),
       ],
     );
@@ -200,33 +101,81 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
 }
 
 class WallpaperCard extends StatelessWidget {
-  WallpaperCard({required this.src});
-  String src;
+  WallpaperCard({required this.wallpaper});
+  final Wallpaper wallpaper;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-      ),
-      child: IntrinsicWidth(
-        child: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+    return CupertinoContextMenu(
+      actions: [
+        CupertinoContextMenuAction(
+          trailingIcon: CupertinoIcons.info,
+          child: const Text('Detail'),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        WallpaperDetailScreen(wallpaper: wallpaper)));
+          },
+        ),
+        CupertinoContextMenuAction(
+          trailingIcon: CupertinoIcons.arrow_down,
+          child: const Text('Download'),
+          onPressed: () {
+            downloadWallpaper(wallpaper);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      WallpaperDetailScreen(wallpaper: wallpaper)));
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          ),
+          child: IntrinsicWidth(
+            child: Stack(
               children: [
-                Expanded(
-                  child: CachedNetworkImage(
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) =>
-                        Center(child: CupertinoActivityIndicator()),
-                    imageUrl: src,
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            Center(child: CupertinoActivityIndicator()),
+                        imageUrl: wallpaper.imageUri.toString(),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  void downloadWallpaper(Wallpaper wallpaper) async {
+    // get screen width and height
+    // request for image
+    var response = await Dio().get(
+        "https://cdn1.i-scmp.com/sites/default/files/images/methode/2019/03/12/7348293c-3e24-11e9-b20a-0cdc8de4a6f4_image_hires_055900.jpg",
+        options: Options(responseType: ResponseType.bytes));
+    var status = await Permission.storage.status;
+    if (status.isDenied) {
+      // We didn't ask for permission yet or the permission has been denied before but not permanently.
+      await Permission.storage.request().isGranted;
+    }
+    final result = await ImageGallerySaver.saveImage(response.data,
+        quality: 60, name: "hello");
+    print(result);
   }
 }
