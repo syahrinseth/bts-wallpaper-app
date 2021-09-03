@@ -14,8 +14,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart' show SystemChrome, rootBundle;
 import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
@@ -122,7 +123,7 @@ class WallpaperCard extends StatelessWidget {
           trailingIcon: CupertinoIcons.arrow_down,
           child: const Text('Download'),
           onPressed: () {
-            downloadWallpaper(wallpaper);
+            downloadWallpaper(context, wallpaper: wallpaper);
             Navigator.pop(context);
           },
         ),
@@ -163,11 +164,11 @@ class WallpaperCard extends StatelessWidget {
     );
   }
 
-  void downloadWallpaper(Wallpaper wallpaper) async {
+  void downloadWallpaper(BuildContext context,
+      {required Wallpaper wallpaper}) async {
     // get screen width and height
     // request for image
-    var response = await Dio().get(
-        "https://cdn1.i-scmp.com/sites/default/files/images/methode/2019/03/12/7348293c-3e24-11e9-b20a-0cdc8de4a6f4_image_hires_055900.jpg",
+    var response = await Dio().get(wallpaper.imageUri.toString(),
         options: Options(responseType: ResponseType.bytes));
     var status = await Permission.storage.status;
     if (status.isDenied) {
@@ -175,7 +176,35 @@ class WallpaperCard extends StatelessWidget {
       await Permission.storage.request().isGranted;
     }
     final result = await ImageGallerySaver.saveImage(response.data,
-        quality: 60, name: "hello");
-    print(result);
+        quality: 80, name: "BTSWallpaper" + wallpaper.id.toString());
+    if (result['isSuccess'] == true) {
+      return showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text('Wallpaper Saved.'),
+          content: Text(''),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Okey'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text('Oops! Something went wrong. Please try again later.'),
+          content: Text(''),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Okey'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
